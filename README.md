@@ -1,2 +1,2 @@
 # gbas
-Generic Bot Adapter for Slack
+Generic Bot Adapter for Slack next-gen platform.
