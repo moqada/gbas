@@ -52,6 +52,7 @@ export type MessageBotResponse = {
   channelId: string;
   text: string;
   threadTs?: string;
+  isMrkdwn?: boolean;
   isReplyBroadcast?: boolean;
   iconEmoji?: string;
   username?: string;

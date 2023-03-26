@@ -35,9 +35,17 @@ Deno.test("res.message()", () => {
     // with threadTs
     opts: { threadTs: "123456789.1234" },
   }, {
+    expected: { channelId, text, threadTs: undefined, type },
+    // with threadTs  (force denied)
+    opts: { threadTs: undefined },
+  }, {
     expected: { channelId: "OTHERCHANNELID", text, type },
     // with channelId
     opts: { channelId: "OTHERCHANNELID" },
+  }, {
+    expected: { channelId, text, type, isMrkdwn: true },
+    // with isMrkdwn
+    opts: { isMrkdwn: true },
   }];
   testCases.forEach(({ expected, opts }) => {
     assertEquals(ctx.res.message(text, opts), expected);
@@ -198,6 +206,26 @@ Deno.test("interrupt.postMessage()", async () => {
     },
     // with username
     opts: { username: "sushi-taro" },
+  }, {
+    expected: {
+      calls: [{
+        channel: channelId,
+        blocks: JSON.stringify([{
+          type: "section",
+          text: { type: "plain_text", text },
+        }]),
+      }],
+      res: {
+        channelId,
+        // @ts-expect-error - actual is string, but workaround mock return undefined
+        text: undefined,
+        messageTs,
+        type,
+        userId,
+      },
+    },
+    // with isMrkdwn
+    opts: { isMrkdwn: false },
   }];
   testCases.forEach(async ({ expected, opts }) => {
     const { chatPostMessageCalls } = setupPostMessage({

@@ -9,6 +9,7 @@ export const respondAsBotFuncInputParameters = {
     text: { type: Schema.types.string },
     threadTs: { type: Schema.types.string },
     iconEmoji: { type: Schema.types.string },
+    isMrkdwn: { type: Schema.types.boolean },
     isReplyBroadcast: { type: Schema.types.boolean },
     username: { type: Schema.types.string },
     // for reaction
@@ -42,9 +43,24 @@ export const createRespondAsBotSlackFunction = (
           if (!inputs.channelId || !inputs.text) {
             throw new Error("channel_id is required");
           }
+          const { isMrkdwn = true } = inputs;
+          // this is a workaround the "mrkdwn" param is not working now (2023/03/26)
+          // normally, to disable mrkdwn set `{text, mrkdwn: false}` only.
+          const mainParams = isMrkdwn
+            ? {
+              text: inputs.text,
+            }
+            : {
+              blocks: [
+                {
+                  type: "section",
+                  text: { type: "plain_text", text: inputs.text },
+                },
+              ],
+            };
           const res = await client.chat.postMessage({
+            ...mainParams,
             channel: inputs.channelId,
-            text: inputs.text,
             thread_ts: inputs.threadTs,
             reply_broadcast: inputs.isReplyBroadcast,
             icon_emoji: inputs.iconEmoji,

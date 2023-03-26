@@ -93,6 +93,16 @@ Deno.test(
       expected: [{ channel: channelId, text, username: "sushi-taro" }],
       // username
       inputs: { type, channelId, text, username: "sushi-taro" },
+    }, {
+      expected: [{
+        channel: channelId,
+        blocks: JSON.stringify([{
+          type: "section",
+          text: { type: "plain_text", text },
+        }]),
+      }],
+      // isMrkdwn
+      inputs: { type, channelId, text, isMrkdwn: false },
     }];
     testCases.forEach(async ({ expected, inputs }) => {
       const { chatPostMessageCalls, reactionsAddCalls, createContext } = setup({

@@ -69,10 +69,30 @@ export const createMessageBasedResponderContext = (
           throw new Error(res.error);
         }
       },
-      postMessage: async (text, { mentionUserIds, ...opts } = {}) => {
+      postMessage: async (
+        text,
+        { mentionUserIds, isMrkdwn = true, ...opts } = {},
+      ) => {
+        // this is a workaround the "mrkdwn" param is not working now (2023/03/26)
+        // normally, to disable mrkdwn set `{text, mrkdwn: false}` only.
+        const mainParams = isMrkdwn
+          ? {
+            text: createMessageText({ text, mentionUserIds }),
+          }
+          : {
+            blocks: [
+              {
+                type: "section",
+                text: {
+                  type: "plain_text",
+                  text: createMessageText({ text, mentionUserIds }),
+                },
+              },
+            ],
+          };
         const res = await client.chat.postMessage({
+          ...mainParams,
           channel: opts?.channelId || channelId,
-          text: createMessageText({ text, mentionUserIds }),
           thread_ts: threadTs,
           ...("threadTs" in opts ? { thread_ts: opts.threadTs } : {}),
           reply_broadcast: opts?.isReplyBroadcast,
