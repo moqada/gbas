@@ -4,6 +4,7 @@ import { ReactionCommandDispatcher } from "./command_dispatcher.ts";
 import { assertEquals } from "../../dev_deps.ts";
 import { createMessageBasedResponderContext } from "../../responders/message_based.ts";
 import { ReactionCommandContext } from "./types.ts";
+import { randomChoice } from "../../utils.ts";
 
 const createContext = (
   { emoji }: { emoji: string },
@@ -24,6 +25,7 @@ const createContext = (
       type: "reaction" as const,
       userId: "USERID",
     },
+    randomChoice,
     ...createMessageBasedResponderContext({ client, channelId, messageTs }),
   };
 };

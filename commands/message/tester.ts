@@ -3,6 +3,7 @@ import { MessageCommandDispatcher } from "./command_dispatcher.ts";
 import { MessageCommand, MessageCommandContext } from "./types.ts";
 import { BotResponse, MaybePromise } from "../../types.ts";
 import { createMessageBasedResponderContextMock } from "../../test_utils.ts";
+import { randomChoice } from "../../utils.ts";
 
 type Context = Omit<MessageCommandContext, "match">;
 type CreateContext = (text: string, ctx?: Partial<Context>) => Context;
@@ -42,6 +43,7 @@ export function createMessageCommandTester(command?: MessageCommand) {
         ...responder.interrupt,
         ...interrupt,
       },
+      randomChoice,
       res: {
         ...responder.res,
         ...res,

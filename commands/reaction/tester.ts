@@ -3,6 +3,7 @@ import { ReactionCommandDispatcher } from "./command_dispatcher.ts";
 import { ReactionCommand, ReactionCommandContext } from "./types.ts";
 import { BotResponse, MaybePromise } from "../../types.ts";
 import { createMessageBasedResponderContextMock } from "../../test_utils.ts";
+import { randomChoice } from "../../utils.ts";
 
 type CreateContext = (
   emoji: string,
@@ -47,6 +48,7 @@ export function createReactionCommandTester(command?: ReactionCommand) {
         ...responder.res,
         ...res,
       },
+      randomChoice,
       token,
       ...ctx,
     };

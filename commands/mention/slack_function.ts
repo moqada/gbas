@@ -8,6 +8,7 @@ import {
 } from "./types.ts";
 import { MentionCommandDispatcher } from "./command_dispatcher.ts";
 import { getThreadTs } from "../../slack_utils.ts";
+import { randomChoice } from "../../utils.ts";
 
 const defaultRespondOnError: RespondOnError = (err, c) => {
   return c.res.message(`Error: \`${err || "unknown error"}\``);
@@ -87,6 +88,7 @@ export const createMentionCommandSlackFunction = ({
           channelType: inputs.channelType,
           threadTs,
         },
+        randomChoice,
         token,
         ...createMessageBasedResponderContext({
           client,

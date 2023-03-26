@@ -4,6 +4,7 @@ import { respondAsBotFuncInputParameters } from "../../slack_functions/respond_a
 import { ReactionCommandContext, RespondOnError } from "./types.ts";
 import { ReactionCommandDispatcher } from "./command_dispatcher.ts";
 import { getThreadTs } from "../../slack_utils.ts";
+import { randomChoice } from "../../utils.ts";
 
 const defaultRespondOnError: RespondOnError = (err, c) => {
   return c.res.message(`Error: \`${err || "unknown error"}\``);
@@ -72,6 +73,7 @@ export const createReactionCommandSlackFunction = ({
           userId: inputs.userId,
           threadTs,
         },
+        randomChoice,
         token,
         ...createMessageBasedResponderContext({
           client,

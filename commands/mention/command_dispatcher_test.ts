@@ -3,6 +3,7 @@ import { createMentionCommand } from "./command_factory.ts";
 import { MentionCommandDispatcher } from "./command_dispatcher.ts";
 import { assertEquals } from "../../dev_deps.ts";
 import { createMessageBasedResponderContext } from "../../responders/message_based.ts";
+import { randomChoice } from "../../utils.ts";
 
 const createContext = ({ text }: { text: string }) => {
   const token = "slack-test-token";
@@ -22,6 +23,7 @@ const createContext = ({ text }: { text: string }) => {
       type: "message" as const,
       userId: "USERID",
     },
+    randomChoice,
     ...createMessageBasedResponderContext({ client, channelId, messageTs }),
   };
 };

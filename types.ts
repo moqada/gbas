@@ -98,6 +98,10 @@ export type BaseCommandContext<TBotEvent> = {
   env: Env;
   event: TBotEvent;
   /**
+   * choice random one from the items
+   */
+  randomChoice: <T>(items: T[]) => T;
+  /**
    * a auth token is the same as provided by SlackFunction's context
    */
   token: string;
