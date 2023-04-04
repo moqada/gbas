@@ -10,7 +10,7 @@ export const createMessageBasedResponderContextMock = (
 ): MessageBasedResponderContext => {
   return {
     interrupt: {
-      addReaction: (emoji: string) => Promise.resolve(),
+      addReaction: () => Promise.resolve(),
       postMessage: (text: string, opts = {}) =>
         Promise.resolve({
           text: createMessageText({
@@ -42,6 +42,7 @@ export const createMessageBasedResponderContextMock = (
         channelId,
         messageTs,
         type: "reaction",
+        ...opts,
       }),
     },
   };

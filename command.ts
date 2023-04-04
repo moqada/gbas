@@ -194,7 +194,7 @@ const main = async () => {
         Deno.exit(1);
       }
       await createMentionCommand({ name: commandName, hasTest });
-      Deno.exit();
+      break;
     }
     case "message":
       if (!await existsPath("bot/message", { isDir: true })) {
@@ -208,7 +208,7 @@ const main = async () => {
         Deno.exit(1);
       }
       await createMessageCommand({ name: commandName, hasTest });
-      Deno.exit();
+      break;
     case "reaction":
       if (!await existsPath("bot/reaction", { isDir: true })) {
         outputError("bot/reaction directory is not found.");
@@ -221,7 +221,7 @@ const main = async () => {
         Deno.exit(1);
       }
       await createReactionCommand({ name: commandName, hasTest });
-      Deno.exit();
+      break;
     default:
       throw new Error(`command type is invalid: ${commandType}`);
   }
