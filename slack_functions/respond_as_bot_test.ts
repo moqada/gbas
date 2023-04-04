@@ -1,9 +1,6 @@
 import { SlackFunctionTester } from "deno-slack-sdk/mod.ts";
 import { assertEquals, mockFetch } from "../dev_deps.ts";
-import {
-  createRespondAsBotSlackFunction,
-  RespondAsBotFunctionDefinition,
-} from "./respond_as_bot.ts";
+import { createRespondAsBotSlackFunction } from "./respond_as_bot.ts";
 
 const { createContext: createContextForType } = SlackFunctionTester(
   createRespondAsBotSlackFunction({
@@ -64,7 +61,7 @@ Deno.test(
 
 Deno.test(
   "it calls chat.postMessage if type: message inputs",
-  async () => {
+  () => {
     const channelId = "DUMMYCHANNELID";
     const text = "DUMMY_TEXT";
     const type = "message";
@@ -72,7 +69,7 @@ Deno.test(
       sourceFile: "foo/bar.ts",
     });
     const testCases: Array<{
-      expected: Array<Record<string, any>>;
+      expected: Array<Record<string, unknown>>;
       inputs: SlackFunctionInputs;
     }> = [{
       expected: [{ channel: channelId, text }],

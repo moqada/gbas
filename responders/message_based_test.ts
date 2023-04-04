@@ -126,7 +126,7 @@ const setupPostMessage = ({ ts, user }: { ts: string; user: string }) => {
   return { chatPostMessageCalls };
 };
 
-Deno.test("interrupt.postMessage()", async () => {
+Deno.test("interrupt.postMessage()", () => {
   const userId = "BOTUSERID";
   const messageTs = "987654321.123";
   const channelId = "TESTCHANNELID";
@@ -141,7 +141,7 @@ Deno.test("interrupt.postMessage()", async () => {
   const testCases: Array<{
     expected: {
       res: Omit<Awaited<ReturnType<typeof ctx.interrupt.postMessage>>, "raw">;
-      calls: Array<Record<string, any>>;
+      calls: Array<Record<string, unknown>>;
     };
     opts: Parameters<typeof ctx.interrupt.postMessage>[1];
   }> = [{
@@ -299,7 +299,7 @@ const setupAddReaction = ({ ts, user }: { ts: string; user: string }) => {
   return { reactionsAddCalls };
 };
 
-Deno.test("interrupt.addReaction()", async () => {
+Deno.test("interrupt.addReaction()", () => {
   const channel = "TESTCHANNELID";
   const timestamp = "123456789.123";
   const name = "pray";
@@ -310,7 +310,7 @@ Deno.test("interrupt.addReaction()", async () => {
     threadTs: "123456789.123",
   });
   const testCases: Array<{
-    expected: Array<Record<string, any>>;
+    expected: Array<Record<string, unknown>>;
     opts: Parameters<typeof ctx.interrupt.addReaction>[1];
   }> = [{
     expected: [{ channel, name, timestamp }],

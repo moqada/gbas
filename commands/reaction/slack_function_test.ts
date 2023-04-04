@@ -191,7 +191,7 @@ Deno.test(
     const dispatcher = new ReactionCommandDispatcher([
       createReactionCommand({
         examples: [":owl: - say hou"],
-        execute: (c) => {
+        execute: () => {
           throw new Error("always throw error");
         },
         name: "owl",
@@ -202,7 +202,7 @@ Deno.test(
       dispatcher,
       sourceFile: "foo/bar.ts",
     });
-    let { createContext } = setup({ slackFuncConfig });
+    const { createContext } = setup({ slackFuncConfig });
     const inputs = {
       channelId: DEFAULT_CHANNEL_ID,
       channelType: "DUMMYCHANNELTYPE",
@@ -237,7 +237,7 @@ Deno.test(
 Deno.test(
   'it returns "none" output and call interrupt methods if call with isQuickResponseEnabled',
   async () => {
-    const apiCalls: Record<string, any>[] = [];
+    const apiCalls: Record<string, unknown>[] = [];
     mockFetch.mock("POST@/api/chat.postMessage", async (c) => {
       const formData = await c.formData();
       const params: Record<string, unknown> = {};
