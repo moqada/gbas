@@ -7,6 +7,7 @@ export type SlackMessageResponse = {
   text: string;
   messageTs: string;
   threadTs?: string;
+  // deno-lint-ignore no-explicit-any
   raw: any;
 };
 

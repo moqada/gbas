@@ -112,8 +112,9 @@ export type BaseCommandContext<TBotEvent> = {
  */
 export type Command<
   TType = string,
-  TContext = BaseCommandContext<any>,
+  TContext = BaseCommandContext<unknown>,
   TExample = string,
+  // deno-lint-ignore ban-types
   TExtra = {},
 > = {
   /**
