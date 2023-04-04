@@ -103,9 +103,9 @@ You can write a test for the command like this:
 ```ts
 import { createReactionCommandTester } from "gbas/mod.ts";
 import { assert, assertEquals } from "std/testing/asserts.ts";
-import { hello } from "./hello.ts";
+import { owl } from "./owl.ts";
 
-const { createContext, dispatch } = createReactionCommandTester(echo);
+const { createContext, dispatch } = createReactionCommandTester(owl);
 
 Deno.test("owl", async () => {
   const c = createContext("owl");
