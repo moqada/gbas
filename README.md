@@ -1,11 +1,13 @@
 # GBAS
 
-This is an adapter for easily creating generic bots on the Slack Next-gen platform that respond to mentions, messages, and emojis.
+This is an adapter for easily creating generic bots on the Slack Next-gen
+platform that respond to mentions, messages, and emojis.
 
 ## Getting Started
 
-First, prepare a Slack Next-gen platform app.
-You can create a new one using the `slack create` command. For more information, please refer to [the official Slack documentation](https://api.slack.com/future/create).
+First, prepare a Slack Next-gen platform app. You can create a new one using the
+`slack create` command. For more information, please refer to
+[the official Slack documentation](https://api.slack.com/future/create).
 
 Then navigate to the slack project directory, run the following:
 
