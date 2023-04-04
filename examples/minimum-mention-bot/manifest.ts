@@ -1,4 +1,6 @@
 import { Manifest } from "deno-slack-sdk/mod.ts";
+import { mentionCommandDispatcher } from "./bot.ts";
+import { mentionCommandWorkflow } from "./triggers/bot_mention.ts";
 
 /**
  * The app manifest contains the app's configuration. This
@@ -7,10 +9,19 @@ import { Manifest } from "deno-slack-sdk/mod.ts";
  */
 export default Manifest({
   name: "minimum-mention-bot",
-  description: "A blank template for building Slack apps with Deno",
+  description: "GBAS minimum sample bot",
   icon: "assets/default_new_app_icon.png",
   functions: [],
-  workflows: [],
-  outgoingDomains: [],
-  botScopes: ["commands", "chat:write", "chat:write.public"],
+  workflows: [mentionCommandWorkflow],
+  outgoingDomains: [...new Set([...mentionCommandDispatcher.outgoingDomains])],
+  botScopes: [
+    "app_mentions:read",
+    "channels:history",
+    "chat:write",
+    "chat:write.customize",
+    "chat:write.public",
+    "commands",
+    "reactions:read",
+    "reactions:write",
+  ],
 });
