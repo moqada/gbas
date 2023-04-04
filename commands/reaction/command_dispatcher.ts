@@ -14,7 +14,7 @@ export class ReactionCommandDispatcher
     return this;
   }
 
-  async dispatch(ctx: ReactionCommandContext) {
+  dispatch(ctx: ReactionCommandContext) {
     const command = this.commands.find((cmd) =>
       cmd.emojis.includes(ctx.event.emoji)
     );

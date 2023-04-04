@@ -15,7 +15,7 @@ export class MessageCommandDispatcher
     return this;
   }
 
-  async dispatch(ctx: Omit<MessageCommandContext, "match">) {
+  dispatch(ctx: Omit<MessageCommandContext, "match">) {
     const mentionRegex = new RegExp(`^<@${ctx.authUserId}>\\s*`);
     if (mentionRegex.test(ctx.event.text)) {
       return ctx.res.none();
