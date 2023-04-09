@@ -6,7 +6,10 @@ import { createMessageBasedResponderContextMock } from "../../test_utils.ts";
 import { randomChoice } from "../../utils.ts";
 
 type Context = Omit<MessageCommandContext, "match">;
-type CreateContext = (text: string, ctx?: Partial<Context>) => Context;
+type PartialContext = Partial<
+  Omit<Context, "event"> & { event: Partial<Omit<Context["event"], "text">> }
+>;
+type CreateContext = (text: string, ctx?: PartialContext) => Context;
 type Dispatch = (c: Context) => MaybePromise<BotResponse>;
 
 export function createMessageCommandTester(): { createContext: CreateContext };

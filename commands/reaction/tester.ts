@@ -5,9 +5,14 @@ import { BotResponse, MaybePromise } from "../../types.ts";
 import { createMessageBasedResponderContextMock } from "../../test_utils.ts";
 import { randomChoice } from "../../utils.ts";
 
+type PartialContext = Partial<
+  Omit<ReactionCommandContext, "event"> & {
+    event: Partial<Omit<ReactionCommandContext["event"], "emoji">>;
+  }
+>;
 type CreateContext = (
   emoji: string,
-  ctx?: Partial<ReactionCommandContext>,
+  ctx?: PartialContext,
 ) => ReactionCommandContext;
 type Dispatch = (c: ReactionCommandContext) => MaybePromise<BotResponse>;
 
