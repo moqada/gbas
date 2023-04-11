@@ -21,6 +21,12 @@ For more examples, please refer to the [examples](/examples) directory.
 
 Implement each function as a command.
 
+You can scaffold code by running the following:
+
+```
+deno run -Ar https://deno.land/x/gbas/command.ts
+```
+
 ### Mention Command
 
 To create a command that responds to mentions, use the following implementation:
