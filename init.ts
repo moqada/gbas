@@ -199,8 +199,10 @@ export default createReactionCommandSlackTrigger({
 };
 
 const getGbasModulePath = () => {
-  const path = new URL(import.meta.url).pathname;
-  return `${path.substring(0, path.lastIndexOf("/"))}/`;
+  const url = new URL(import.meta.url);
+  return `${url.protocol}//${url.host}${
+    url.pathname.substring(0, url.pathname.lastIndexOf("/"))
+  }/`;
 };
 
 await createBotCode();
