@@ -429,3 +429,37 @@ Deno.test("interrupt.updateMessage()", () => {
     assertExists(res.raw);
   });
 });
+
+Deno.test("interrupt.deleteMessage()", async () => {
+  const messageTs = "987654321.123";
+  const channelId = "TESTCHANNELID";
+  const eventChannelId = "EVENTCHANNELID";
+  const eventMessageTs = "123456789.123";
+  const ctx = createMessageBasedResponderContext({
+    client: SlackAPI("slack-function-test-token"),
+    channelId: eventChannelId,
+    messageTs: eventMessageTs,
+  });
+
+  const chatDeleteMessageCalls: Record<string, unknown>[] = [];
+  mockFetch.mock("POST@/api/chat.delete", async (req) => {
+    const params: Record<string, unknown> = {};
+    const formData = await req.formData();
+    for (const [key, val] of formData.entries()) {
+      params[key] = val;
+    }
+    chatDeleteMessageCalls.push(params);
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        channel: params.channel,
+        ts: messageTs,
+      }),
+      { status: 200 },
+    );
+  });
+
+  await ctx.interrupt.deleteMessage({ channelId, messageTs });
+
+  assertEquals(chatDeleteMessageCalls, [{ channel: channelId, ts: messageTs }]);
+});

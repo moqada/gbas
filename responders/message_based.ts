@@ -23,6 +23,12 @@ export type MessageBasedResponderContext = {
       opts?: AddReactionOption,
     ) => Promise<void>;
     /**
+     * delete a message
+     */
+    deleteMessage: (
+      opts: { channelId: string; messageTs: string },
+    ) => Promise<void>;
+    /**
      * post a message to a channel
      */
     postMessage: (
@@ -76,6 +82,17 @@ export const createMessageBasedResponderContext = (
           name: emoji,
           channel: opts?.channelId || channelId,
           timestamp: opts?.messageTs || messageTs,
+        });
+        if (!res.ok) {
+          throw new Error(res.error);
+        }
+      },
+      deleteMessage: async (
+        { channelId, messageTs }: { channelId: string; messageTs: string },
+      ) => {
+        const res = await client.chat.delete({
+          channel: channelId,
+          ts: messageTs,
         });
         if (!res.ok) {
           throw new Error(res.error);

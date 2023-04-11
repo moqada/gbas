@@ -11,6 +11,7 @@ export const createMessageBasedResponderContextMock = (
   return {
     interrupt: {
       addReaction: () => Promise.resolve(),
+      deleteMessage: () => Promise.resolve(),
       postMessage: (text: string, opts = {}) =>
         Promise.resolve({
           text: createMessageText({
