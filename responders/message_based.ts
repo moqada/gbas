@@ -23,11 +23,29 @@ export type MessageBasedResponderContext = {
       opts?: AddReactionOption,
     ) => Promise<void>;
     /**
+     * delete a message
+     */
+    deleteMessage: (
+      opts: { channelId: string; messageTs: string },
+    ) => Promise<void>;
+    /**
      * post a message to a channel
      */
     postMessage: (
       text: string,
       opts?: PostMessageOption,
+    ) => Promise<SlackMessageResponse>;
+    /**
+     * update a message
+     */
+    updateMessage: (
+      text: string,
+      opts: {
+        channelId: string;
+        messageTs: string;
+        mentionUserIds?: string[];
+        isReplyBroadcast?: boolean;
+      },
     ) => Promise<SlackMessageResponse>;
   };
   /**
@@ -64,6 +82,17 @@ export const createMessageBasedResponderContext = (
           name: emoji,
           channel: opts?.channelId || channelId,
           timestamp: opts?.messageTs || messageTs,
+        });
+        if (!res.ok) {
+          throw new Error(res.error);
+        }
+      },
+      deleteMessage: async (
+        { channelId, messageTs }: { channelId: string; messageTs: string },
+      ) => {
+        const res = await client.chat.delete({
+          channel: channelId,
+          ts: messageTs,
         });
         if (!res.ok) {
           throw new Error(res.error);
@@ -110,6 +139,28 @@ export const createMessageBasedResponderContext = (
           userId: res.message.user,
           raw: res,
           ...(res.message.thread_ts ? { threadTs: res.message.thread_ts } : {}),
+        };
+      },
+      updateMessage: async (
+        text,
+        { channelId, messageTs, mentionUserIds, ...opts },
+      ) => {
+        const res = await client.chat.update({
+          channel: channelId,
+          ts: messageTs,
+          text: createMessageText({ text, mentionUserIds }),
+          reply_broadcast: opts?.isReplyBroadcast,
+        });
+        if (!res.ok) {
+          throw new Error(res.error);
+        }
+        return {
+          type: "message",
+          channelId: res.channel,
+          messageTs: res.ts,
+          text: res.message.text,
+          userId: res.message.user,
+          raw: res,
         };
       },
     },

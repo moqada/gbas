@@ -11,6 +11,7 @@ export const createMessageBasedResponderContextMock = (
   return {
     interrupt: {
       addReaction: () => Promise.resolve(),
+      deleteMessage: () => Promise.resolve(),
       postMessage: (text: string, opts = {}) =>
         Promise.resolve({
           text: createMessageText({
@@ -19,6 +20,17 @@ export const createMessageBasedResponderContextMock = (
           }),
           channelId,
           messageTs,
+          type: "message",
+          userId,
+          raw: {},
+          ...opts,
+        }),
+      updateMessage: (
+        text: string,
+        { mentionUserIds, isReplyBroadcast: _, ...opts },
+      ) =>
+        Promise.resolve({
+          text: createMessageText({ mentionUserIds, text }),
           type: "message",
           userId,
           raw: {},
