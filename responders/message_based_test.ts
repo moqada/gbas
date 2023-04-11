@@ -334,3 +334,98 @@ Deno.test("interrupt.addReaction()", () => {
     assertEquals(reactionsAddCalls, expected);
   });
 });
+
+const setupUpdateMessage = ({ ts, user }: { ts: string; user: string }) => {
+  const chatUpdateMessageCalls: Record<string, unknown>[] = [];
+  mockFetch.mock("POST@/api/chat.update", async (req) => {
+    const params: Record<string, unknown> = {};
+    const formData = await req.formData();
+    for (const [key, val] of formData.entries()) {
+      params[key] = val;
+    }
+    chatUpdateMessageCalls.push(params);
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        channel: params.channel,
+        text: params.text,
+        ts,
+        message: {
+          text: params.text,
+          user,
+          ...(params.thread_ts ? { thread_ts: params.thread_ts } : {}),
+        },
+      }),
+      { status: 200 },
+    );
+  });
+  return { chatUpdateMessageCalls };
+};
+
+Deno.test("interrupt.updateMessage()", () => {
+  const userId = "BOTUSERID";
+  const messageTs = "987654321.123";
+  const channelId = "TESTCHANNELID";
+  const eventChannelId = "EVENTCHANNELID";
+  const eventMessageTs = "123456789.123";
+  const text = "hello";
+  const type = "message";
+  const ctx = createMessageBasedResponderContext({
+    client: SlackAPI("slack-function-test-token"),
+    channelId: eventChannelId,
+    messageTs: eventMessageTs,
+  });
+  const testCases: Array<{
+    expected: {
+      res: Omit<Awaited<ReturnType<typeof ctx.interrupt.updateMessage>>, "raw">;
+      calls: Array<Record<string, unknown>>;
+    };
+    opts: Parameters<typeof ctx.interrupt.updateMessage>[1];
+  }> = [{
+    expected: {
+      calls: [{ channel: channelId, text, ts: messageTs }],
+      res: { channelId, text, messageTs, type, userId },
+    },
+    // default
+    opts: { channelId, messageTs },
+  }, {
+    expected: {
+      calls: [{
+        channel: channelId,
+        text: "<@USERID1> <@USERID2> hello",
+        ts: messageTs,
+      }],
+      res: {
+        channelId,
+        text: "<@USERID1> <@USERID2> hello",
+        messageTs,
+        type,
+        userId,
+      },
+    },
+    // with mentions
+    opts: { channelId, messageTs, mentionUserIds: ["USERID1", "USERID2"] },
+  }, {
+    expected: {
+      calls: [{
+        channel: channelId,
+        text,
+        ts: messageTs,
+        reply_broadcast: "true",
+      }],
+      res: { channelId, text, messageTs, type, userId },
+    },
+    // with isReplyBroadcast
+    opts: { channelId, messageTs, isReplyBroadcast: true },
+  }];
+  testCases.forEach(async ({ expected, opts }) => {
+    const { chatUpdateMessageCalls } = setupUpdateMessage({
+      ts: messageTs,
+      user: userId,
+    });
+    const res = await ctx.interrupt.updateMessage(text, opts);
+    assertEquals(chatUpdateMessageCalls, expected.calls);
+    assertObjectMatch(res, expected.res);
+    assertExists(res.raw);
+  });
+});

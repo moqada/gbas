@@ -29,6 +29,18 @@ export type MessageBasedResponderContext = {
       text: string,
       opts?: PostMessageOption,
     ) => Promise<SlackMessageResponse>;
+    /**
+     * update a message
+     */
+    updateMessage: (
+      text: string,
+      opts: {
+        channelId: string;
+        messageTs: string;
+        mentionUserIds?: string[];
+        isReplyBroadcast?: boolean;
+      },
+    ) => Promise<SlackMessageResponse>;
   };
   /**
    * final response methods of the bot
@@ -110,6 +122,28 @@ export const createMessageBasedResponderContext = (
           userId: res.message.user,
           raw: res,
           ...(res.message.thread_ts ? { threadTs: res.message.thread_ts } : {}),
+        };
+      },
+      updateMessage: async (
+        text,
+        { channelId, messageTs, mentionUserIds, ...opts },
+      ) => {
+        const res = await client.chat.update({
+          channel: channelId,
+          ts: messageTs,
+          text: createMessageText({ text, mentionUserIds }),
+          reply_broadcast: opts?.isReplyBroadcast,
+        });
+        if (!res.ok) {
+          throw new Error(res.error);
+        }
+        return {
+          type: "message",
+          channelId: res.channel,
+          messageTs: res.ts,
+          text: res.message.text,
+          userId: res.message.user,
+          raw: res,
         };
       },
     },
