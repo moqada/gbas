@@ -1,4 +1,5 @@
 import { cliffy, colors } from "./deps.ts";
+import { lowerCamelToSnake } from "./utils.ts";
 
 const existsPath = async (
   path: string,
@@ -25,6 +26,7 @@ const outputFileCreated = (path: string) => {
 const createMentionCommand = async (
   { name, hasTest }: { name: string; hasTest: boolean },
 ) => {
+  const filename = lowerCamelToSnake(name);
   // command
   const command = `import { createMentionCommand } from "gbas/mod.ts";
 
@@ -38,7 +40,7 @@ export const ${name} = createMentionCommand({
   },
 });
 `;
-  const commandFile = `bot/mention/${name}.ts`;
+  const commandFile = `bot/mention/${filename}.ts`;
   await Deno.writeTextFile(commandFile, command);
   outputFileCreated(commandFile);
   // test
@@ -56,14 +58,14 @@ Deno.test("${name}", async () => {
   assertEquals(res.text, "${name} command: foo");
 });
 `;
-    const testFile = `bot/mention/${name}_test.ts`;
+    const testFile = `bot/mention/${filename}_test.ts`;
     await Deno.writeTextFile(testFile, test);
     outputFileCreated(testFile);
   }
   // mod
   await Deno.writeTextFile(
     "bot/mention/mod.ts",
-    `export { ${name} } from "./${name}.ts";\n`,
+    `export { ${name} } from "./${filename}.ts";\n`,
     { append: true },
   );
 };
@@ -71,6 +73,7 @@ Deno.test("${name}", async () => {
 const createMessageCommand = async (
   { name, hasTest }: { name: string; hasTest: boolean },
 ) => {
+  const filename = lowerCamelToSnake(name);
   // command
   const command = `import { createMessageCommand } from "gbas/mod.ts";
 
@@ -83,7 +86,7 @@ export const ${name} = createMessageCommand({
   },
 });
 `;
-  const commandFile = `bot/message/${name}.ts`;
+  const commandFile = `bot/message/${filename}.ts`;
   await Deno.writeTextFile(commandFile, command);
   outputFileCreated(commandFile);
   // test
@@ -101,14 +104,14 @@ Deno.test("${name}", async () => {
   assertEquals(res.text, "${name} command works!");
 });
 `;
-    const testFile = `bot/message/${name}_test.ts`;
+    const testFile = `bot/message/${filename}_test.ts`;
     await Deno.writeTextFile(testFile, test);
     outputFileCreated(testFile);
   }
   // mod
   await Deno.writeTextFile(
     "bot/message/mod.ts",
-    `export { ${name} } from "./${name}.ts";\n`,
+    `export { ${name} } from "./${filename}.ts";\n`,
     { append: true },
   );
 };
@@ -116,6 +119,7 @@ Deno.test("${name}", async () => {
 const createReactionCommand = async (
   { name, hasTest }: { name: string; hasTest: boolean },
 ) => {
+  const filename = lowerCamelToSnake(name);
   // command
   const command = `import { createReactionCommand } from "gbas/mod.ts";
 
@@ -128,7 +132,7 @@ export const ${name} = createReactionCommand({
   },
 });
 `;
-  const commandFile = `bot/reaction/${name}.ts`;
+  const commandFile = `bot/reaction/${filename}.ts`;
   await Deno.writeTextFile(commandFile, command);
   outputFileCreated(commandFile);
   // test
@@ -146,14 +150,14 @@ Deno.test("${name}", async () => {
   assertEquals(res.text, "${name} added!");
 });
 `;
-    const testFile = `bot/reaction/${name}_test.ts`;
+    const testFile = `bot/reaction/${filename}_test.ts`;
     await Deno.writeTextFile(testFile, test);
     outputFileCreated(testFile);
   }
   // mod
   await Deno.writeTextFile(
     "bot/reaction/mod.ts",
-    `export { ${name} } from "./${name}.ts";\n`,
+    `export { ${name} } from "./${filename}.ts";\n`,
     { append: true },
   );
 };
@@ -173,6 +177,12 @@ const main = async () => {
   });
   const commandName = await cliffy.Input.prompt({
     message: "Input command name",
+    validate: (value) => {
+      if (value.match(/^[a-z0-9][a-zA-Z0-9]+$/)) {
+        return true;
+      }
+      return "command name must be lowerCamelCase";
+    },
   });
   if (!commandName) {
     outputError("command name is required");
@@ -183,45 +193,50 @@ const main = async () => {
   });
   switch (commandType) {
     case "mention": {
+      const filename = lowerCamelToSnake(commandName);
       if (!await existsPath("bot/mention", { isDir: true })) {
         outputError("bot/mention directory is not found.");
         Deno.exit(1);
       } else if (!await existsPath("bot/mention/mod.ts")) {
         outputError("bot/mention/mod.ts is not found.");
         Deno.exit(1);
-      } else if (await existsPath(`bot/mention/${commandName}.ts`)) {
-        outputError(`bot/mention/${commandName}.ts already exists.`);
+      } else if (await existsPath(`bot/mention/${filename}.ts`)) {
+        outputError(`bot/mention/${filename}.ts already exists.`);
         Deno.exit(1);
       }
       await createMentionCommand({ name: commandName, hasTest });
       break;
     }
-    case "message":
+    case "message": {
+      const filename = lowerCamelToSnake(commandName);
       if (!await existsPath("bot/message", { isDir: true })) {
         outputError("bot/message directory is not found.");
         Deno.exit(1);
       } else if (!await existsPath("bot/message/mod.ts")) {
         outputError("bot/message/mod.ts is not found.");
         Deno.exit(1);
-      } else if (await existsPath(`bot/message/${commandName}.ts`)) {
-        outputError(`bot/message/${commandName}.ts already exists.`);
+      } else if (await existsPath(`bot/message/${filename}.ts`)) {
+        outputError(`bot/message/${filename}.ts already exists.`);
         Deno.exit(1);
       }
       await createMessageCommand({ name: commandName, hasTest });
       break;
-    case "reaction":
+    }
+    case "reaction": {
+      const filename = lowerCamelToSnake(commandName);
       if (!await existsPath("bot/reaction", { isDir: true })) {
         outputError("bot/reaction directory is not found.");
         Deno.exit(1);
       } else if (!await existsPath("bot/reaction/mod.ts")) {
         outputError("bot/reaction/mod.ts is not found.");
         Deno.exit(1);
-      } else if (await existsPath(`bot/reaction/${commandName}.ts`)) {
-        outputError(`bot/reaction/${commandName}.ts already exists.`);
+      } else if (await existsPath(`bot/reaction/${filename}.ts`)) {
+        outputError(`bot/reaction/${filename}.ts already exists.`);
         Deno.exit(1);
       }
       await createReactionCommand({ name: commandName, hasTest });
       break;
+    }
     default:
       throw new Error(`command type is invalid: ${commandType}`);
   }
