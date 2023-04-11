@@ -198,6 +198,11 @@ export default createReactionCommandSlackTrigger({
   await Deno.writeTextFile("triggers/bot_reaction_command.ts", codeTrigger);
 };
 
+const getGbasModulePath = () => {
+  const path = new URL(import.meta.url).pathname;
+  return `${path.substring(0, path.lastIndexOf("/"))}/`;
+};
+
 await createBotCode();
 await Deno.mkdir("functions", { recursive: true });
 await Deno.mkdir("workflows", { recursive: true });
@@ -236,7 +241,7 @@ botScopes: [
   "reactions:read",
   "reactions:write",
 ],`;
-const snippet3 = `"gbas/": "https://deno.land/x/gbas@0.1.0/",
+const snippet3 = `"gbas/": "${getGbasModulePath()}",
 "std/": "https://deno.land/std@0.181.0/",`;
 const message = `🎉 Successfly created bot code.
 
