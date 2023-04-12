@@ -33,7 +33,7 @@ const createMentionCommand = async (
 export const ${name} = createMentionCommand({
   name: "${name}",
   examples: ["${name} <text> - YOUR COMMAND DESCRIPTION"],
-  pattern: /^${name}\\s*(.+)$/i,
+  pattern: /^${name}\\s+(.+)$/i,
   execute: (c) => {
     const text = c.match[1];
     return c.res.message(\`${name} command: \${text}\`);
