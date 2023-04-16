@@ -5,8 +5,10 @@ platform that respond to mentions, messages, and emojis.
 
 ## Getting Started
 
-First, prepare a Slack Next-gen platform app. You can create a new one using the
-`slack create` command. For more information, please refer to
+First, prepare a Slack Next-gen platform app.
+
+You can create a new one using the `slack create` command. For more information,
+please refer to
 [the official Slack documentation](https://api.slack.com/future/create).
 
 Then navigate to the slack project directory, run the following:
@@ -14,6 +16,40 @@ Then navigate to the slack project directory, run the following:
 ```
 deno run -Ar https://deno.land/x/gbas/init.ts
 ```
+
+<details>
+<summary>Actually command output example</summary>
+
+```zsh
+┗╸❯❯❯ slack create sample
+⚙️  Creating a new Slack app in ~/sample
+
+📦 Installed project dependencies
+
+✨ sample successfully created
+
+🧭 Explore the documentation to learn more
+   Read the README.md or peruse the docs over at api.slack.com/future
+   Find available commands and usage info with slack help
+
+📋 Follow the steps below to begin development
+   Change into your project directory with cd sample/
+   Develop locally and see changes in real-time with slack run
+   When you're ready to deploy for production use slack deploy
+
+┗╸❯❯❯ cd sample
+
+┗╸❯❯❯ deno run -Ar https://deno.land/x/gbas/init.ts
+🎉 Successfully created bot code.
+
+You must edit bot/config.ts.
+
+1. Change CHANNEL_IDS in bot/config.ts.
+2. Add your first command by `deno run -Ar https://deno.land/x/gbas/command.ts`
+3. Develop locally with `slack run`.
+```
+
+</details>
 
 For more examples, please refer to the [examples](/examples) directory.
 
