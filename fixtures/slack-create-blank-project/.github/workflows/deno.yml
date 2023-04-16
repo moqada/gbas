@@ -8,6 +8,7 @@ on:
 
 jobs:
   deno:
+    if: github.repository == 'slack-samples/deno-blank-template'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -28,3 +29,6 @@ jobs:
 
       - name: Run tests
         run: deno task test
+
+      - name: Run type check
+        run: deno check *.ts

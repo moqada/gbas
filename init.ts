@@ -1,9 +1,9 @@
-import { colors } from "./deps.ts";
+import { colors, tsMorph } from "./deps.ts";
 
 /**
- * create code in bot directory
+ * create files in bot directory
  */
-const createBotCode = async () => {
+const createBotFiles = async () => {
   // command dirs
   const commands = ["mention", "message", "reaction"];
   for (const command of commands) {
@@ -49,9 +49,9 @@ mentionCommandDispatcher.register(
 };
 
 /**
- * create code for respond as bot
+ * create a file for respond as bot
  */
-const createRespondAsBotFunctionCode = async () => {
+const createRespondAsBotFunctionFile = async () => {
   // Function
   const codeFunction =
     `import { createRespondAsBotSlackFunction } from "gbas/mod.ts";
@@ -67,9 +67,9 @@ export default respondAsBotFunc;
 };
 
 /**
- * create code for mention command
+ * create files for mention command
  */
-const createMentionCommandCode = async () => {
+const createMentionCommandFiles = async () => {
   // Function
   const codeFunction =
     `import { createMentionCommandSlackFunction } from "gbas/mod.ts";
@@ -112,9 +112,9 @@ export default createMentionCommandSlackTrigger({
 };
 
 /**
- * create code for message command
+ * create files for message command
  */
-const createMessageCommandCode = async () => {
+const createMessageCommandFiles = async () => {
   // Function
   const codeFunction =
     `import { createMessageCommandSlackFunction } from "gbas/mod.ts";
@@ -156,7 +156,7 @@ export default createMessageCommandSlackTrigger({
   await Deno.writeTextFile("triggers/bot_message_command.ts", codeTrigger);
 };
 
-const createReactionCommandCode = async () => {
+const createReactionCommandFiles = async () => {
   // Function
   const codeFunction =
     `import { createReactionCommandSlackFunction } from "gbas/mod.ts";
@@ -198,23 +198,154 @@ export default createReactionCommandSlackTrigger({
   await Deno.writeTextFile("triggers/bot_reaction_command.ts", codeTrigger);
 };
 
+/**
+ * Apply changes to manifest.ts
+ */
+const updateManifestFile = async (
+  { project }: { project: tsMorph.Project },
+) => {
+  const sourceFile = project.getSourceFileOrThrow("./manifest.ts");
+
+  // Add new import declarations
+  sourceFile.addImportDeclarations([{
+    namedImports: [
+      "mentionCommandDispatcher",
+      "messageCommandDispatcher",
+      "reactionCommandDispatcher",
+    ],
+    moduleSpecifier: "./bot/dispatchers.ts",
+  }, {
+    namedImports: ["botMentionCommandWorkflow"],
+    moduleSpecifier: "./workflows/bot_mention_command.ts",
+  }, {
+    namedImports: ["botMessageCommandWorkflow"],
+    moduleSpecifier: "./workflows/bot_message_command.ts",
+  }, {
+    namedImports: ["botReactionCommandWorkflow"],
+    moduleSpecifier: "./workflows/bot_reaction_command.ts",
+  }]);
+
+  const manifestCall = sourceFile.getExportAssignmentOrThrow(
+    (exportAssignment) => {
+      return !!exportAssignment.getExpression();
+    },
+  ).getExpression();
+  const objectLiteral = manifestCall.getFirstChildByKindOrThrow(
+    tsMorph.ts.SyntaxKind.ObjectLiteralExpression,
+  );
+
+  // Replace outgoingDomains value
+  const outgoingDomainsToAdd = [
+    "...mentionCommandDispatcher.outgoingDomains",
+    "...messageCommandDispatcher.outgoingDomains",
+    "...reactionCommandDispatcher.outgoingDomains",
+  ];
+  const outgoingDomainsProperty = objectLiteral.getProperty("outgoingDomains");
+  if (outgoingDomainsProperty) {
+    const outgoingDomainsArray = outgoingDomainsProperty
+      .getFirstChildByKindOrThrow(
+        tsMorph.ts.SyntaxKind.ArrayLiteralExpression,
+      );
+    const outgoingDomainsText = outgoingDomainsArray.getElements().length === 0
+      ? outgoingDomainsToAdd.join(",")
+      : `...${outgoingDomainsArray.getFullText().trim()}, ${
+        outgoingDomainsToAdd.join(",")
+      }`;
+    outgoingDomainsArray.replaceWithText(
+      `[...new Set(${outgoingDomainsText})]`,
+    );
+  } else {
+    objectLiteral.addProperty(
+      `outgoingDomains: [${outgoingDomainsToAdd.join(",")}]`,
+    );
+  }
+
+  // Replace workflows value
+  const workflowsToAdd = [
+    "botMentionCommandWorkflow",
+    "botMessageCommandWorkflow",
+    "botReactionCommandWorkflow",
+  ];
+  const workflowsProperty = objectLiteral.getProperty("workflows");
+  if (workflowsProperty) {
+    const workflowsArray = workflowsProperty.getFirstChildByKindOrThrow(
+      tsMorph.ts.SyntaxKind.ArrayLiteralExpression,
+    );
+    workflowsArray.addElements(workflowsToAdd);
+  } else {
+    objectLiteral.addProperty(`workflows: [${workflowsToAdd.join(",")}]`);
+  }
+
+  // Replace botScopes value
+  const requiredBotScopes = [
+    "app_mentions:read",
+    "channels:history",
+    "commands",
+    "chat:write",
+    "chat:write.customize",
+    "chat:write.public",
+    "reactions:read",
+    "reactions:write",
+  ];
+  const botScopesProperty = objectLiteral.getPropertyOrThrow("botScopes");
+  const botScopesArray = botScopesProperty.getFirstChildByKindOrThrow(
+    tsMorph.ts.SyntaxKind.ArrayLiteralExpression,
+  );
+  // const botScopeArrayElements = botScopesArray.getElements();
+  const botScopesElements = botScopesArray.getElements().map((element) => {
+    return element.getText().trim();
+  });
+  const botScopesToAdd = requiredBotScopes.filter((scope) => {
+    return !botScopesElements?.includes(`"${scope}"`);
+  });
+  botScopesArray.addElements(botScopesToAdd.map((scope) => {
+    return `"${scope}"`;
+  }));
+  sourceFile.formatText();
+  await sourceFile.save();
+};
+
 const getGbasModulePath = () => {
-  const url = new URL(import.meta.url);
+  const path = import.meta.url.startsWith("http")
+    ? import.meta.url
+    : "https://deno.land/x/gbas/mod.ts";
+  const url = new URL(path);
   return `${url.protocol}//${url.host}${
     url.pathname.substring(0, url.pathname.lastIndexOf("/"))
   }/`;
 };
 
-await createBotCode();
-await Deno.mkdir("functions", { recursive: true });
-await Deno.mkdir("workflows", { recursive: true });
-await Deno.mkdir("triggers", { recursive: true });
-await createRespondAsBotFunctionCode();
-await createMentionCommandCode();
-await createMessageCommandCode();
-await createReactionCommandCode();
+const getStdModulePath = async (gbasModulePath: string) => {
+  const path = `${gbasModulePath}import_map.json`;
+  let text = "";
+  if (path.startsWith("http")) {
+    const body = await fetch(path);
+    text = await body.text();
+  } else {
+    text = await Deno.readTextFile(path.replace("file://", ""));
+  }
+  const json = JSON.parse(text);
+  return json.imports["std/"];
+};
 
-const snippet1 = `import {
+/**
+ * Apply changes to import_map.json
+ */
+const updateImportMapFile = async () => {
+  const filepath = "./import_map.json";
+  const file = await Deno.readTextFile(filepath);
+  const json: { imports: Record<string, string> } = JSON.parse(file);
+  const gbasModulePath = getGbasModulePath();
+  if (!json["imports"]["gbas/"]) {
+    json["imports"]["gbas/"] = gbasModulePath;
+  }
+  if (!json["imports"]["std/"]) {
+    json["imports"]["std/"] = await getStdModulePath(gbasModulePath);
+  }
+  await Deno.writeTextFile(filepath, JSON.stringify(json, null, 2));
+};
+
+const MANIFEST_FILE_SNIPPET_1 = `import {
   mentionCommandDispatcher,
   messageCommandDispatcher,
   reactionCommandDispatcher,
@@ -222,7 +353,7 @@ const snippet1 = `import {
 import { botMentionCommandWorkflow } from "./workflows/bot_mention_command.ts";
 import { botMessageCommandWorkflow } from "./workflows/bot_message_command.ts";
 import { botReactionCommandWorkflow } from "./workflows/bot_reaction_command.ts";`;
-const snippet2 =
+const MANIFEST_FILE_SNIPPET_2 =
   `workflows: [botMentionCommandWorkflow, botMessageCommandWorkflow, botReactionCommandWorkflow],
 outgoingDomains: [
   ...new Set(
@@ -243,39 +374,83 @@ botScopes: [
   "reactions:read",
   "reactions:write",
 ],`;
-const snippet3 = `"gbas/": "${getGbasModulePath()}",
+const IMPORT_MAP_FILE_SNIPPET = `"gbas/": "${getGbasModulePath()}",
 "std/": "https://deno.land/std@0.181.0/",`;
-const message = `🎉 Successfly created bot code.
 
-You must edit ${colors.brightCyan("manifest.ts")} and ${
-  colors.brightCyan("bot/config.ts")
-}.
+const main = async () => {
+  await createBotFiles();
+  await Deno.mkdir("functions", { recursive: true });
+  await Deno.mkdir("workflows", { recursive: true });
+  await Deno.mkdir("triggers", { recursive: true });
+  await createRespondAsBotFunctionFile();
+  await createMentionCommandFiles();
+  await createMessageCommandFiles();
+  await createReactionCommandFiles();
 
-1. Copy and paste the following code to ${colors.brightCyan("manifest.ts")}:
+  const project = new tsMorph.Project({
+    resolutionHost: tsMorph.ResolutionHosts.deno,
+  });
+  project.addSourceFilesAtPaths("**/*.ts");
+
+  const mustEditFiles = ["bot/config.ts"];
+  const steps = [];
+
+  try {
+    await updateManifestFile({ project });
+  } catch (_) {
+    mustEditFiles.push("manifest.ts");
+    steps.push(
+      `Copy and paste the following code to ${colors.brightCyan("manifest.ts")}:
 
 ${colors.gray("```")}
-${colors.gray(snippet1)}
-${colors.gray("```")}
-
-2. Edit Manifest parameters in ${
-  colors.brightCyan("manifest.ts")
-} like the following:
-
-${colors.gray("```")}
-${colors.gray(snippet2)}
-${colors.gray("```")}
-
-3. Add the following dependencies to ${colors.brightCyan("import_map.json")}:
+${colors.gray(MANIFEST_FILE_SNIPPET_1)}
+${colors.gray("```")}`,
+    );
+    steps.push(
+      `Edit Manifest parameters in ${
+        colors.brightCyan("manifest.ts")
+      } like the following:
 
 ${colors.gray("```")}
-${colors.gray(snippet3)}
+${colors.gray(MANIFEST_FILE_SNIPPET_2)}
+${colors.gray("```")}`,
+    );
+  }
+
+  try {
+    await updateImportMapFile();
+  } catch (_) {
+    steps.push(
+      `Add the following dependencies to ${
+        colors.brightCyan("import_map.json")
+      }:
+
 ${colors.gray("```")}
+${colors.gray(IMPORT_MAP_FILE_SNIPPET)}
+${colors.gray("```")}`,
+    );
+  }
+  steps.push(`Change CHANNEL_IDS in ${colors.brightCyan("bot/config.ts")}.`);
+  steps.push(
+    `Add your first command by \`${
+      colors.brightCyan("deno run -Ar https://deno.land/x/gbas/command.ts")
+    }\``,
+  );
+  steps.push(
+    `Develop locally with \`${colors.brightCyan("slack run")}\`.`,
+  );
 
-4. Change CHANNEL_IDS in ${colors.brightCyan("bot/config.ts")}.
-5. Add your first command by \`${
-  colors.brightCyan("deno run -Ar https://deno.land/x/gbas/command.ts")
-}\`.
-6. Develop locally with \`${colors.brightCyan("slack run")}\`.
-`;
+  const message = `🎉 Successfully created bot code.
 
-console.log(message);
+You must edit ${
+    mustEditFiles.map((filename) => colors.brightCyan(filename)).join(", ")
+  }.
+
+${steps.map((step, index) => `${index + 1}. ${step}`).join("\n")}`;
+
+  console.log(message);
+
+  await new Deno.Command("deno", { args: ["fmt"] }).output();
+};
+
+await main();
