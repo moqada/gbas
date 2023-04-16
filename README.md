@@ -125,4 +125,4 @@ Deno.test("owl", async () => {
 
 ## Development
 
-- Test: `deno test`
+- Test: `deno task test`
