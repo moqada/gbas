@@ -1,0 +1,237 @@
+export const snapshot = {};
+
+snapshot[`init 1`] = `
+"🎉 Successfully created bot code.
+
+You must edit \\x1b[96mbot/config.ts\\x1b[39m.
+
+1. Change CHANNEL_IDS in \\x1b[96mbot/config.ts\\x1b[39m.
+2. Add your first command by \`\\x1b[96mdeno run -Ar https://deno.land/x/gbas/command.ts\\x1b[39m\`
+3. Develop locally with \`\\x1b[96mslack run\\x1b[39m\`.
+"
+`;
+
+snapshot[`init 2`] = `
+'import {
+  createHelpMentionCommand,
+  MentionCommandDispatcher,
+  MessageCommandDispatcher,
+  ReactionCommandDispatcher,
+} from "gbas/mod.ts";
+import * as mentionCommands from "./mention/mod.ts";
+import * as messageCommands from "./message/mod.ts";
+import * as reactionCommands from "./reaction/mod.ts";
+
+export const mentionCommandDispatcher = new MentionCommandDispatcher(
+  Object.values(mentionCommands),
+);
+export const messageCommandDispatcher = new MessageCommandDispatcher(
+  Object.values(messageCommands),
+);
+export const reactionCommandDispatcher = new ReactionCommandDispatcher(
+  Object.values(reactionCommands),
+);
+mentionCommandDispatcher.register(
+  createHelpMentionCommand({
+    commands: {
+      mention: mentionCommandDispatcher.commands,
+      message: messageCommandDispatcher.commands,
+      reaction: reactionCommandDispatcher.commands,
+    },
+  }),
+);
+'
+`;
+
+snapshot[`init 3`] = `
+'export const CHANNEL_IDS: [string, ...string[]] = ["YOUR_BOT_CHANNEL_ID"];
+'
+`;
+
+snapshot[`init 4`] = `
+'import { createMentionCommandSlackFunction } from "gbas/mod.ts";
+import { mentionCommandDispatcher } from "../bot/dispatchers.ts";
+
+const { def: botMentionCommandFuncDef, func: botMentionCommandFunc } =
+  createMentionCommandSlackFunction({
+    dispatcher: mentionCommandDispatcher,
+    sourceFile: "functions/bot_mention_command.ts",
+  });
+export { botMentionCommandFuncDef };
+export default botMentionCommandFunc;
+'
+`;
+
+snapshot[`init 5`] = `
+'import { createMessageCommandSlackFunction } from "gbas/mod.ts";
+import { messageCommandDispatcher } from "../bot/dispatchers.ts";
+
+const { def: botMessageCommandFuncDef, func: botMessageCommandFunc } =
+  createMessageCommandSlackFunction({
+    dispatcher: messageCommandDispatcher,
+    sourceFile: "functions/bot_message_command.ts",
+  });
+export { botMessageCommandFuncDef };
+export default botMessageCommandFunc;
+'
+`;
+
+snapshot[`init 6`] = `
+'import { createReactionCommandSlackFunction } from "gbas/mod.ts";
+import { reactionCommandDispatcher } from "../bot/dispatchers.ts";
+
+const { def: botReactionCommandFuncDef, func: botReactionCommandFunc } =
+  createReactionCommandSlackFunction({
+    dispatcher: reactionCommandDispatcher,
+    sourceFile: "functions/bot_reaction_command.ts",
+  });
+export { botReactionCommandFuncDef };
+export default botReactionCommandFunc;
+'
+`;
+
+snapshot[`init 7`] = `
+'import { createRespondAsBotSlackFunction } from "gbas/mod.ts";
+
+const { def: respondAsBotFuncDef, func: respondAsBotFunc } =
+  createRespondAsBotSlackFunction({
+    sourceFile: "functions/respond_as_bot.ts",
+  });
+export { respondAsBotFuncDef };
+export default respondAsBotFunc;
+'
+`;
+
+snapshot[`init 8`] = `
+'import { createMentionCommandSlackTrigger } from "gbas/mod.ts";
+import { CHANNEL_IDS } from "../bot/config.ts";
+import { botMentionCommandWorkflow } from "../workflows/bot_mention_command.ts";
+
+export default createMentionCommandSlackTrigger({
+  channelIds: CHANNEL_IDS,
+  workflow: botMentionCommandWorkflow,
+});
+'
+`;
+
+snapshot[`init 9`] = `
+'import { createMessageCommandSlackTrigger } from "gbas/mod.ts";
+import { CHANNEL_IDS } from "../bot/config.ts";
+import { botMessageCommandWorkflow } from "../workflows/bot_message_command.ts";
+
+export default createMessageCommandSlackTrigger({
+  channelIds: CHANNEL_IDS,
+  workflow: botMessageCommandWorkflow,
+});
+'
+`;
+
+snapshot[`init 10`] = `
+'import { createReactionCommandSlackTrigger } from "gbas/mod.ts";
+import { CHANNEL_IDS } from "../bot/config.ts";
+import { botReactionCommandWorkflow } from "../workflows/bot_reaction_command.ts";
+
+export default createReactionCommandSlackTrigger({
+  channelIds: CHANNEL_IDS,
+  workflow: botReactionCommandWorkflow,
+});
+'
+`;
+
+snapshot[`init 11`] = `
+'import { createMentionCommandSlackWorkflow } from "gbas/mod.ts";
+import { botMentionCommandFuncDef } from "../functions/bot_mention_command.ts";
+import { respondAsBotFuncDef } from "../functions/respond_as_bot.ts";
+
+export const botMentionCommandWorkflow = createMentionCommandSlackWorkflow({
+  isQuickResponseEnabled: true,
+  mentionCommandFuncDef: botMentionCommandFuncDef,
+  respondAsBotFuncDef: respondAsBotFuncDef,
+});
+'
+`;
+
+snapshot[`init 12`] = `
+'import { createMessageCommandSlackWorkflow } from "gbas/mod.ts";
+import { botMessageCommandFuncDef } from "../functions/bot_message_command.ts";
+import { respondAsBotFuncDef } from "../functions/respond_as_bot.ts";
+
+export const botMessageCommandWorkflow = createMessageCommandSlackWorkflow({
+  isQuickResponseEnabled: true,
+  messageCommandFuncDef: botMessageCommandFuncDef,
+  respondAsBotFuncDef: respondAsBotFuncDef,
+});
+'
+`;
+
+snapshot[`init 13`] = `
+'import { createReactionCommandSlackWorkflow } from "gbas/mod.ts";
+import { botReactionCommandFuncDef } from "../functions/bot_reaction_command.ts";
+import { respondAsBotFuncDef } from "../functions/respond_as_bot.ts";
+
+export const botReactionCommandWorkflow = createReactionCommandSlackWorkflow({
+  reactionCommandFuncDef: botReactionCommandFuncDef,
+  respondAsBotFuncDef: respondAsBotFuncDef,
+  isQuickResponseEnabled: true,
+});
+'
+`;
+
+snapshot[`init 14`] = `
+\`import { Manifest } from "deno-slack-sdk/mod.ts";
+import {
+  mentionCommandDispatcher,
+  messageCommandDispatcher,
+  reactionCommandDispatcher,
+} from "./bot/dispatchers.ts";
+import { botMentionCommandWorkflow } from "./workflows/bot_mention_command.ts";
+import { botMessageCommandWorkflow } from "./workflows/bot_message_command.ts";
+import { botReactionCommandWorkflow } from "./workflows/bot_reaction_command.ts";
+
+/**
+ * The app manifest contains the app's configuration. This
+ * file defines attributes like app name and description.
+ * https://api.slack.com/future/manifest
+ */
+export default Manifest({
+  name: "slack-create-blank-project",
+  description: "A blank template for building Slack apps with Deno",
+  icon: "assets/default_new_app_icon.png",
+  functions: [],
+  workflows: [
+    botMentionCommandWorkflow,
+    botMessageCommandWorkflow,
+    botReactionCommandWorkflow,
+  ],
+  outgoingDomains: [
+    ...new Set(
+      ...mentionCommandDispatcher.outgoingDomains,
+      ...messageCommandDispatcher.outgoingDomains,
+      ...reactionCommandDispatcher.outgoingDomains,
+    ),
+  ],
+  botScopes: [
+    "commands",
+    "chat:write",
+    "chat:write.public",
+    "app_mentions:read",
+    "channels:history",
+    "chat:write.customize",
+    "reactions:read",
+    "reactions:write",
+  ],
+});
+\`
+`;
+
+snapshot[`init 15`] = `
+'{
+  "imports": {
+    "deno-slack-sdk/": "https://deno.land/x/deno_slack_sdk@2.0.1/",
+    "deno-slack-api/": "https://deno.land/x/deno_slack_api@2.0.0/",
+    "gbas/": "https://deno.land/x/gbas/",
+    "std/": "https://deno.land/std@0.180.0/"
+  }
+}
+'
+`;
