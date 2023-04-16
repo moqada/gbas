@@ -440,7 +440,7 @@ ${colors.gray("```")}`,
     `Develop locally with \`${colors.brightCyan("slack run")}\`.`,
   );
 
-  const message = `🎉 Successfly created bot code.
+  const message = `🎉 Successfully created bot code.
 
 You must edit ${
     mustEditFiles.map((filename) => colors.brightCyan(filename)).join(", ")
