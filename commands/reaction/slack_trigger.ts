@@ -5,12 +5,12 @@ import { ReactionCommandWorkflowDefinition } from "./slack_workflow.ts";
 /**
  * create SlackTrigger for the ReactionCommand
  */
-export const createReactionCommandSlackTrigger = (
+export function createReactionCommandSlackTrigger(
   { channelIds, workflow }: {
     channelIds: PopulatedArray<string>;
     workflow: ReactionCommandWorkflowDefinition;
   },
-) => {
+) {
   const botReactionTrigger: Trigger<typeof workflow.definition> = {
     type: "event",
     name: "Bot reaction trigger",
@@ -28,4 +28,4 @@ export const createReactionCommandSlackTrigger = (
     },
   };
   return botReactionTrigger;
-};
+}

@@ -19,12 +19,12 @@ export const respondAsBotFuncInputParameters = {
   required: ["type" as const],
 };
 
-export const createRespondAsBotSlackFunction = (
+export function createRespondAsBotSlackFunction(
   { callbackId = "respond_as_bot", sourceFile }: {
     callbackId?: string;
     sourceFile: string;
   },
-) => {
+) {
   const def = DefineFunction({
     callback_id: callbackId,
     title: "Respond as the bot",
@@ -89,7 +89,7 @@ export const createRespondAsBotSlackFunction = (
     },
   );
   return { def, func };
-};
+}
 
 export type RespondAsBotFunctionDefinition = ReturnType<
   typeof createRespondAsBotSlackFunction

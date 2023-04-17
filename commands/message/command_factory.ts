@@ -1,8 +1,10 @@
 import { MessageCommand } from "./types.ts";
 
-export const createMessageCommand = (
+export function createMessageCommand(
   definition: Omit<MessageCommand, "type">,
-): MessageCommand => ({
-  type: "message",
-  ...definition,
-});
+): MessageCommand {
+  return {
+    type: "message",
+    ...definition,
+  };
+}

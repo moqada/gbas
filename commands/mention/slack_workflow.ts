@@ -23,7 +23,7 @@ export const mentionCommandWorkflowInputParameters = {
 /**
  * create SlackWorkflow for the MentionCommand
  */
-export const createMentionCommandSlackWorkflow = (
+export function createMentionCommandSlackWorkflow(
   {
     isQuickResponseEnabled = false,
     mentionCommandFuncDef,
@@ -33,7 +33,7 @@ export const createMentionCommandSlackWorkflow = (
     mentionCommandFuncDef: MentionCommandFunctionDefinition;
     respondAsBotFuncDef: RespondAsBotFunctionDefinition;
   },
-) => {
+) {
   const workflow = DefineWorkflow({
     callback_id: "bot_mention_command_workflow",
     title: "Bot mention workflow",
@@ -47,7 +47,7 @@ export const createMentionCommandSlackWorkflow = (
     workflow.addStep(respondAsBotFuncDef, mentionStep.outputs);
   }
   return workflow;
-};
+}
 
 export type MentionCommandWorkflowDefinition = ReturnType<
   typeof createMentionCommandSlackWorkflow

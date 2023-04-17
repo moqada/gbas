@@ -11,13 +11,13 @@ export type SlackMessageResponse = {
   raw: any;
 };
 
-export const getThreadTs = async (
+export async function getThreadTs(
   { client, messageTs, channelId }: {
     channelId: string;
     client: SlackAPIClient;
     messageTs: string;
   },
-) => {
+) {
   const res = await client.chat.getPermalink({
     message_ts: messageTs,
     channel: channelId,
@@ -29,12 +29,12 @@ export const getThreadTs = async (
   const url = new URL(res.permalink);
   const threadTs = url.searchParams.get("thread_ts");
   return threadTs || undefined;
-};
+}
 
-export const createMessageText = (
+export function createMessageText(
   { mentionUserIds = [], text }: { mentionUserIds?: string[]; text: string },
-) => {
+) {
   return mentionUserIds.length > 0
     ? `${mentionUserIds.map((id) => `<@${id}>`).join(" ")} ${text}`
     : text;
-};
+}

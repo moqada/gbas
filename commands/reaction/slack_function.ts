@@ -28,7 +28,7 @@ export const reactionCommandFuncInputParameters = {
 /**
  * create SlackFunction for the ReactionCommand
  */
-export const createReactionCommandSlackFunction = ({
+export function createReactionCommandSlackFunction({
   dispatcher,
   sourceFile,
   callbackId = "bot_reaction_command_function",
@@ -38,7 +38,7 @@ export const createReactionCommandSlackFunction = ({
   callbackId?: string;
   sourceFile: string;
   respondOnError?: RespondOnError;
-}) => {
+}) {
   const def = DefineFunction({
     callback_id: callbackId,
     source_file: sourceFile,
@@ -119,7 +119,7 @@ export const createReactionCommandSlackFunction = ({
     },
   );
   return { def, func };
-};
+}
 
 export type ReactionCommandFunctionDefinition = ReturnType<
   typeof createReactionCommandSlackFunction

@@ -5,12 +5,12 @@ import { MentionCommandWorkflowDefinition } from "./slack_workflow.ts";
 /**
  * create SlackTrigger for the MentionCommand
  */
-export const createMentionCommandSlackTrigger = (
+export function createMentionCommandSlackTrigger(
   { channelIds, workflow }: {
     channelIds: PopulatedArray<string>;
     workflow: MentionCommandWorkflowDefinition;
   },
-) => {
+) {
   const botMentionTrigger: Trigger<typeof workflow.definition> = {
     type: "event",
     name: "Bot mention trigger",
@@ -31,4 +31,4 @@ export const createMentionCommandSlackTrigger = (
     },
   };
   return botMentionTrigger;
-};
+}

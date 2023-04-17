@@ -35,7 +35,7 @@ export const mentionCommandFuncInputParameters = {
 /**
  * create SlackFunction for the MentionCommand
  */
-export const createMentionCommandSlackFunction = ({
+export function createMentionCommandSlackFunction({
   dispatcher,
   sourceFile,
   callbackId = "bot_mention_command_function",
@@ -47,7 +47,7 @@ export const createMentionCommandSlackFunction = ({
   sourceFile: string;
   respondOnError?: RespondOnError;
   respondOnCommandNotFound?: RespondOnCommandNotFound;
-}) => {
+}) {
   if (respondOnCommandNotFound) {
     dispatcher.onNotFound(respondOnCommandNotFound);
   }
@@ -134,7 +134,7 @@ export const createMentionCommandSlackFunction = ({
     },
   );
   return { def, func };
-};
+}
 
 export type MentionCommandFunctionDefinition = ReturnType<
   typeof createMentionCommandSlackFunction

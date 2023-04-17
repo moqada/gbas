@@ -1,8 +1,10 @@
 import { ReactionCommand } from "./types.ts";
 
-export const createReactionCommand = (
+export function createReactionCommand(
   definition: Omit<ReactionCommand, "type">,
-): ReactionCommand => ({
-  type: "reaction",
-  ...definition,
-});
+): ReactionCommand {
+  return {
+    type: "reaction",
+    ...definition,
+  };
+}

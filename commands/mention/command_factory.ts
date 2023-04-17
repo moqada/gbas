@@ -1,8 +1,10 @@
 import { MentionCommand } from "./types.ts";
 
-export const createMentionCommand = (
+export function createMentionCommand(
   definition: Omit<MentionCommand, "type">,
-): MentionCommand => ({
-  type: "mention",
-  ...definition,
-});
+): MentionCommand {
+  return {
+    type: "mention",
+    ...definition,
+  };
+}

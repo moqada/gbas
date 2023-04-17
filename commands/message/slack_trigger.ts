@@ -5,12 +5,12 @@ import { MessageCommandWorkflowDefinition } from "./slack_workflow.ts";
 /**
  * create SlackTrigger for the MessageCommand
  */
-export const createMessageCommandSlackTrigger = (
+export function createMessageCommandSlackTrigger(
   { channelIds, workflow }: {
     channelIds: PopulatedArray<string>;
     workflow: MessageCommandWorkflowDefinition;
   },
-) => {
+) {
   const botMessageTrigger: Trigger<typeof workflow.definition> = {
     type: "event",
     name: "Bot message trigger",
@@ -36,4 +36,4 @@ export const createMessageCommandSlackTrigger = (
     },
   };
   return botMessageTrigger;
-};
+}

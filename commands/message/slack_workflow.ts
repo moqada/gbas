@@ -23,7 +23,7 @@ export const messageCommandWorkflowInputParameters = {
 /**
  * create SlackWorkflow for the MessageCommand
  */
-export const createMessageCommandSlackWorkflow = (
+export function createMessageCommandSlackWorkflow(
   {
     isQuickResponseEnabled = false,
     messageCommandFuncDef,
@@ -33,7 +33,7 @@ export const createMessageCommandSlackWorkflow = (
     messageCommandFuncDef: MessageCommandFunctionDefinition;
     respondAsBotFuncDef: RespondAsBotFunctionDefinition;
   },
-) => {
+) {
   const workflow = DefineWorkflow({
     callback_id: "bot_message_command_workflow",
     title: "Bot message workflow",
@@ -47,7 +47,7 @@ export const createMessageCommandSlackWorkflow = (
     workflow.addStep(respondAsBotFuncDef, messageStep.outputs);
   }
   return workflow;
-};
+}
 
 export type MessageCommandWorkflowDefinition = ReturnType<
   typeof createMessageCommandSlackWorkflow
