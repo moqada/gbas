@@ -1,13 +1,13 @@
 import { MessageBasedResponderContext } from "./responders/message_based.ts";
 import { createMessageText } from "./slack_utils.ts";
 
-export const createMessageBasedResponderContextMock = (
+export function createMessageBasedResponderContextMock(
   { channelId, messageTs, userId }: {
     channelId: string;
     messageTs: string;
     userId: string;
   },
-): MessageBasedResponderContext => {
+): MessageBasedResponderContext {
   return {
     interrupt: {
       addReaction: () => Promise.resolve(),
@@ -58,4 +58,4 @@ export const createMessageBasedResponderContextMock = (
       }),
     },
   };
-};
+}

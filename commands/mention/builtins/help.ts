@@ -45,7 +45,7 @@ const defaultExamples = [
   "help <query> - show usage of commands that match <query>" as const,
 ];
 
-export const createHelpMentionCommand = (
+export function createHelpMentionCommand(
   {
     commands,
     examples = defaultExamples,
@@ -67,7 +67,7 @@ export const createHelpMentionCommand = (
       c: MentionCommandContext,
     ) => MaybePromise<BotResponse>;
   },
-) => {
+) {
   const help = createMentionCommand({
     name: "help",
     pattern: /^help(\s+(.+))?/,
@@ -100,4 +100,4 @@ export const createHelpMentionCommand = (
     },
   });
   return help;
-};
+}

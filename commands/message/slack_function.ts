@@ -31,7 +31,7 @@ export const messageCommandFuncInputParameters = {
 /**
  * create SlackFunction for the MessageCommand
  */
-export const createMessageCommandSlackFunction = ({
+export function createMessageCommandSlackFunction({
   dispatcher,
   sourceFile,
   callbackId = "bot_message_command_function",
@@ -41,7 +41,7 @@ export const createMessageCommandSlackFunction = ({
   callbackId?: string;
   sourceFile: string;
   respondOnError?: RespondOnError;
-}) => {
+}) {
   const def = DefineFunction({
     callback_id: callbackId,
     source_file: sourceFile,
@@ -127,7 +127,7 @@ export const createMessageCommandSlackFunction = ({
     },
   );
   return { def, func };
-};
+}
 
 export type MessageCommandFunctionDefinition = ReturnType<
   typeof createMessageCommandSlackFunction

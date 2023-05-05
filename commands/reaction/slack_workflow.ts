@@ -20,7 +20,7 @@ export const reactionCommandWorkflowInputParameters = {
 /**
  * create SlackWorkflow for the ReactionCommand
  */
-export const createReactionCommandSlackWorkflow = (
+export function createReactionCommandSlackWorkflow(
   {
     isQuickResponseEnabled = false,
     reactionCommandFuncDef,
@@ -30,7 +30,7 @@ export const createReactionCommandSlackWorkflow = (
     reactionCommandFuncDef: ReactionCommandFunctionDefinition;
     respondAsBotFuncDef: RespondAsBotFunctionDefinition;
   },
-) => {
+) {
   const workflow = DefineWorkflow({
     callback_id: "bot_reaction_command_workflow",
     title: "Bot reaction workflow",
@@ -44,7 +44,7 @@ export const createReactionCommandSlackWorkflow = (
     workflow.addStep(respondAsBotFuncDef, reactionStep.outputs);
   }
   return workflow;
-};
+}
 
 export type ReactionCommandWorkflowDefinition = ReturnType<
   typeof createReactionCommandSlackWorkflow
