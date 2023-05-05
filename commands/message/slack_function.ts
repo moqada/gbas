@@ -13,7 +13,7 @@ export const messageCommandFuncInputParameters = {
   properties: {
     channelId: { type: Schema.slack.types.channel_id },
     channelType: { type: Schema.types.string },
-    userId: { type: Schema.slack.types.user_id },
+    userId: { type: Schema.types.string },
     message: { type: Schema.types.string },
     messageTs: { type: Schema.types.string },
     threadTs: { type: Schema.types.string },
@@ -22,7 +22,6 @@ export const messageCommandFuncInputParameters = {
   required: [
     "channelId" as const,
     "channelType" as const,
-    "userId" as const,
     "message" as const,
     "messageTs" as const,
   ],
@@ -52,11 +51,16 @@ export function createMessageCommandSlackFunction({
   const func = SlackFunction(
     def,
     async ({ client, env, inputs, token }) => {
+      const userId = inputs.userId?.trim();
+      if (!userId) {
+        // empty userId is not supported - it is maybe an app message
+        return { outputs: { type: "none" } };
+      }
       const res = await client.auth.test();
       if (!res.ok) {
         return { error: res.error ?? "client.auth.test failed" };
       }
-      if (res.user_id === inputs.userId) {
+      if (res.user_id === userId) {
         return { outputs: { type: "none" } };
       }
       let threadTs = typeof inputs.threadTs === "string"
@@ -77,7 +81,7 @@ export function createMessageCommandSlackFunction({
           messageTs: inputs.messageTs,
           text: inputs.message,
           type: "message",
-          userId: inputs.userId,
+          userId,
           channelType: inputs.channelType,
           threadTs,
         },

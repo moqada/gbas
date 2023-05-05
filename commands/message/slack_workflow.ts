@@ -6,7 +6,7 @@ export const messageCommandWorkflowInputParameters = {
   properties: {
     channelId: { type: Schema.slack.types.channel_id },
     channelType: { type: Schema.types.string },
-    userId: { type: Schema.slack.types.user_id },
+    userId: { type: Schema.types.string },
     message: { type: Schema.types.string },
     messageTs: { type: Schema.types.string },
     threadTs: { type: Schema.types.string },
@@ -14,7 +14,6 @@ export const messageCommandWorkflowInputParameters = {
   required: [
     "channelId" as const,
     "channelType" as const,
-    "userId" as const,
     "message" as const,
     "messageTs" as const,
   ],

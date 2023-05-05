@@ -32,7 +32,8 @@ export function createMessageCommandSlackTrigger(
       messageTs: { value: "{{data.message_ts}}" },
       // temporary workaround (2023/03/20): it responds only in threads if prefix space is nothing
       threadTs: { value: " {{data.thread_ts}}" },
-      userId: { value: "{{data.user_id}}" },
+      // temporary workaround (2023/05/05): data.user_id sometimes returns null then it raises a validation error
+      userId: { value: " {{data.user_id}}" },
     },
   };
   return botMessageTrigger;

@@ -189,6 +189,29 @@ Deno.test(
 );
 
 Deno.test(
+  "it returns none output if the message is sent by the app",
+  async () => {
+    const dispatcher = createDefaultMentionCommandDispatcher();
+    const slackFuncConfig = createMessageCommandSlackFunction({
+      dispatcher,
+      sourceFile: "foo/bar.ts",
+    });
+    const inputs = {
+      channelId: DEFAULT_CHANNEL_ID,
+      channelType: "DUMMYCHANNELTYPE",
+      // this message was sent by app
+      // a value becomes " " because workaround if event.data.user_id is null in message event trigger.
+      userId: " ",
+      message: "hi",
+      messageTs: "1673778812501.0",
+    };
+    const { createContext } = setup({ slackFuncConfig });
+    const res = await slackFuncConfig.func(createContext({ inputs }));
+    assertEquals(res.outputs, { type: "none" });
+  },
+);
+
+Deno.test(
   'it returns "error" output if matched handlers throw error',
   async () => {
     const dispatcher = new MessageCommandDispatcher([
