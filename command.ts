@@ -1,4 +1,4 @@
-import { cliffy, colors } from "./deps.ts";
+import { cliffyPrompt, colors } from "./deps.ts";
 import { lowerCamelToSnake } from "./utils.ts";
 
 const existsPath = async (
@@ -170,12 +170,12 @@ const main = async () => {
     );
     Deno.exit(1);
   }
-  const commandType = await cliffy.Select.prompt({
+  const commandType = await cliffyPrompt.Select.prompt({
     message: "Select command type",
     options: ["mention", "message", "reaction"],
     default: "mention",
   });
-  const commandName = await cliffy.Input.prompt({
+  const commandName = await cliffyPrompt.Input.prompt({
     message: "Input command name",
     validate: (value) => {
       if (value.match(/^[a-z0-9][a-zA-Z0-9]+$/)) {
@@ -188,7 +188,7 @@ const main = async () => {
     outputError("command name is required");
     Deno.exit(1);
   }
-  const hasTest = await cliffy.Confirm.prompt({
+  const hasTest = await cliffyPrompt.Confirm.prompt({
     message: "Create a test file?",
   });
   switch (commandType) {
